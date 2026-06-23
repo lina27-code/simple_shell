@@ -46,11 +46,36 @@ int is_builtin(char **argv)
  */
 int execute_builtin(char **argv, int *status)
 {
+     int exit_status;
+
     if (argv == NULL || argv[0] == NULL)
         return (0);
 
+    /* Handle exit with optional status */
     if (strcmp(argv[0], "exit") == 0)
-        exit(*status);
+    {
+        if (argv[1] != NULL)
+        {
+            if (is_number(argv[1]))
+            {
+                exit_status = _atoi(argv[1]);
+                exit(exit_status);
+            }
+            else
+            {
+                write(STDERR_FILENO, "./hsh: exit: Illegal number: ", 29);
+                write(STDERR_FILENO, argv[1], strlen(argv[1]));
+                write(STDERR_FILENO, "\n", 1);
+                *status = 2;
+                return (1);
+            }
+        }
+        else
+        {
+            /* No argument - exit with last status */
+            exit(*status);
+        }
+    }
 
     if (strcmp(argv[0], "env") == 0)
     {
