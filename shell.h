@@ -31,6 +31,8 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 char *_strtok(char *str, const char *delim);
 int is_number(char *s);
 int _atoi(char *s);
-
+int _setenv(const char *name, const char *value, int overwrite);
+int _unsetenv(const char *name);
+char *_getenv(const char *name);
 
 #endif 

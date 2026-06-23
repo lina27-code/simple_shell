@@ -33,6 +33,10 @@ int is_builtin(char **argv)
         return (1);
     if (strcmp(argv[0], "env") == 0)
         return (1);
+    if (strcmp(argv[0], "setenv") == 0)
+        return (1);
+    if (strcmp(argv[0], "unsetenv") == 0)
+        return (1);
 
     return (0);
 }
@@ -80,6 +84,31 @@ int execute_builtin(char **argv, int *status)
     if (strcmp(argv[0], "env") == 0)
     {
         *status = print_env();
+        return (1);
+    }
+       /* Handle setenv */
+    if (strcmp(argv[0], "setenv") == 0)
+    {
+        if (argv[1] == NULL || argv[2] == NULL)
+        {
+            write(STDERR_FILENO, "setenv: Usage: setenv VARIABLE VALUE\n", 37);
+            *status = 1;
+            return (1);
+        }
+        *status = _setenv(argv[1], argv[2], 1);
+        return (1);
+    }
+
+    /* Handle unsetenv */
+    if (strcmp(argv[0], "unsetenv") == 0)
+    {
+        if (argv[1] == NULL)
+        {
+            write(STDERR_FILENO, "unsetenv: Usage: unsetenv VARIABLE\n", 35);
+            *status = 1;
+            return (1);
+        }
+        *status = _unsetenv(argv[1]);
         return (1);
     }
 
