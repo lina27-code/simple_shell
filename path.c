@@ -11,6 +11,7 @@ char *find_in_path(char *command)
     char *path, *path_copy, *dir;
     char *full_path;
     struct stat st;
+    char *result = NULL;
 
     if (command == NULL)
         return (NULL);
@@ -33,7 +34,7 @@ char *find_in_path(char *command)
         return (NULL);
 
     /* Search through each directory in PATH */
-    dir = strtok(path_copy, ":");
+    dir = _strtok(path_copy, ":");
     while (dir != NULL)
     {
         full_path = malloc(strlen(dir) + strlen(command) + 2);
@@ -46,14 +47,14 @@ char *find_in_path(char *command)
         sprintf(full_path, "%s/%s", dir, command);
         if (stat(full_path, &st) == 0 && (st.st_mode & S_IXUSR))
         {
-            free(path_copy);
-            return (full_path);
+            result = full_path;
+            break;
         }
 
         free(full_path);
-        dir = strtok(NULL, ":");
+        dir = _strtok(NULL, ":");
     }
 
     free(path_copy);
-    return (NULL);
+    return (result);
 }

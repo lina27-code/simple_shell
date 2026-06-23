@@ -27,5 +27,10 @@ int parse_command(char *command, char **argv);
 int print_env(void);
 int is_builtin(char **argv);
 int execute_builtin(char **argv, int *status);
+ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
+char *_strtok(char *str, const char *delim);
+int is_number(char *s);
+int _atoi(char *s);
+
 
 #endif 

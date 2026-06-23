@@ -19,7 +19,7 @@ char *read_command(void)
     size_t len = 0;
     ssize_t nread;
 
-    nread = getline(&line, &len, stdin);
+    nread = _getline(&line, &len, stdin);
     if (nread == -1)
     {
         free(line);
@@ -27,7 +27,7 @@ char *read_command(void)
     }
 
     /* Remove newline character */
-    if (line[nread - 1] == '\n')
+    if (nread > 0 && line[nread - 1] == '\n')
         line[nread - 1] = '\0';
 
     return (line);

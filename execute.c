@@ -9,8 +9,12 @@
  */
 int parse_command(char *command, char **argv)
 {
-    int i = 0;
     char *token;
+    int i = 0;
+
+    /* Skip leading whitespace */
+    while (*command == ' ' || *command == '\t')
+        command++;
 
     token = strtok(command, " \t");
     while (token != NULL && i < 127)
@@ -34,11 +38,20 @@ int execute_command(char *command, char *program_name)
 {
     pid_t pid;
     int status;
+    int i;
     char *argv[128];
     int argc;
     char *full_path;
 
+    /* Handle empty command (just newline or spaces) */
     if (command == NULL || command[0] == '\0')
+        return (0);
+
+    /* Check if command is only whitespace */
+     i = 0;
+    while (command[i] == ' ' || command[i] == '\t')
+        i++;
+    if (command[i] == '\0')
         return (0);
 
     /* Parse command into arguments */
