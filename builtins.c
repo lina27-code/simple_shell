@@ -63,6 +63,7 @@ int execute_builtin(char **argv, int *status)
             if (is_number(argv[1]))
             {
                 exit_status = _atoi(argv[1]);
+                free_prev_dir(); /* Clean up */
                 exit(exit_status);
             }
             else
@@ -76,17 +77,19 @@ int execute_builtin(char **argv, int *status)
         }
         else
         {
-            /* No argument - exit with last status */
+            free_prev_dir(); /* Clean up */
             exit(*status);
         }
     }
 
+    /* Handle env */
     if (strcmp(argv[0], "env") == 0)
     {
         *status = print_env();
         return (1);
     }
-       /* Handle setenv */
+
+    /* Handle setenv */
     if (strcmp(argv[0], "setenv") == 0)
     {
         if (argv[1] == NULL || argv[2] == NULL)
@@ -112,5 +115,13 @@ int execute_builtin(char **argv, int *status)
         return (1);
     }
 
+    /* Handle cd */
+    if (strcmp(argv[0], "cd") == 0)
+    {
+        *status = _cd(argv);
+        return (1);
+    }
+
     return (0);
 }
+             

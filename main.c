@@ -34,6 +34,8 @@ int main(int ac, char **av)
 
         free(command);
     }
-
+    
+    /* Clean up */
+    free_prev_dir();
     return (status);
 } 

@@ -13,6 +13,9 @@
 /* Global variable for environment */
 extern char **environ;
 
+/* Global variable for previous directory (used by cd -) */
+extern char *prev_dir;
+
 /* Prompt string */
 #define PROMPT "$ "
 
@@ -34,5 +37,8 @@ int _atoi(char *s);
 int _setenv(const char *name, const char *value, int overwrite);
 int _unsetenv(const char *name);
 char *_getenv(const char *name);
-
+extern char *prev_dir;
+int _cd(char **argv);
+int _cd(char **argv);
+void free_prev_dir(void);
 #endif 
