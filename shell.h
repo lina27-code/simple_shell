@@ -41,4 +41,6 @@ extern char *prev_dir;
 int _cd(char **argv);
 int _cd(char **argv);
 void free_prev_dir(void);
+int execute_commands(char *commands, char *program_name);
+
 #endif 

@@ -29,8 +29,8 @@ int main(int ac, char **av)
             break;
         }
 
-        /* Execute command */
-        status = execute_command(command, av[0]);
+        /* Execute commands with ; seperator handling */
+        status = execute_commands(command, av[0]);
 
         free(command);
     }
