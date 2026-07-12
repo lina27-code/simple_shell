@@ -37,6 +37,10 @@ int is_builtin(char **argv)
         return (1);
     if (strcmp(argv[0], "unsetenv") == 0)
         return (1);
+    if (strcmp(argv[0], "alias") == 0)
+    return (1);
+    if (strcmp(argv[0], "cd") == 0)
+    return (1);
 
     return (0);
 }
@@ -54,6 +58,17 @@ int execute_builtin(char **argv, int *status)
 
     if (argv == NULL || argv[0] == NULL)
         return (0);
+    if (strcmp(argv[0], "alias") == 0)
+{
+    *status = alias_builtin(argv);
+    return (1);
+}
+
+if (strcmp(argv[0], "cd") == 0)
+{
+    *status = _cd(argv);
+    return (1);
+}
 
     /* Handle exit with optional status */
     if (strcmp(argv[0], "exit") == 0)
@@ -63,11 +78,15 @@ int execute_builtin(char **argv, int *status)
             if (is_number(argv[1]))
             {
                 exit_status = _atoi(argv[1]);
-                free_prev_dir(); /* Clean up */
+                last_exit_status = exit_status;
                 exit(exit_status);
             }
             else
             {
+                exit_status = *status;
+        last_exit_status = exit_status;
+        exit(exit_status);
+
                 write(STDERR_FILENO, "./hsh: exit: Illegal number: ", 29);
                 write(STDERR_FILENO, argv[1], strlen(argv[1]));
                 write(STDERR_FILENO, "\n", 1);

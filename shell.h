@@ -10,37 +10,74 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-/* Global variable for environment */
+/* Global variables */
 extern char **environ;
-
-/* Global variable for previous directory (used by cd -) */
+extern int last_exit_status;
+extern pid_t shell_pid;
 extern char *prev_dir;
+extern int shell_exiting;
+  /* Add this for cd - */
 
 /* Prompt string */
 #define PROMPT "$ "
 
-/* Function prototypes */
+/* Alias structure (Task 13) */
+typedef struct alias_s
+{
+    char *name;
+    char *value;
+    struct alias_s *next;
+} alias_t;
+
+/* Core functions */
 void display_prompt(void);
 char *read_command(void);
-int execute_command(char *command, char *program_name);  /* <-- Added program_name parameter */
+int execute_command(char *command, char *program_name);
+int execute_commands(char *commands, char *program_name);
 void print_error(char *program_name, char *command);
 void free_command(char *command);
+
+/* PATH handling */
 char *find_in_path(char *command);
+
+/* Command parsing */
 int parse_command(char *command, char **argv);
+
+/* Built-ins */
 int print_env(void);
 int is_builtin(char **argv);
 int execute_builtin(char **argv, int *status);
+
+/* Custom implementations (Task 6 & 7) */
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 char *_strtok(char *str, const char *delim);
+
+/* Helper functions */
 int is_number(char *s);
 int _atoi(char *s);
+
+/* Environment functions (Task 9) */
+char *_getenv(const char *name);
 int _setenv(const char *name, const char *value, int overwrite);
 int _unsetenv(const char *name);
-char *_getenv(const char *name);
-extern char *prev_dir;
-int _cd(char **argv);
+
+/* cd built-in (Task 10) */
 int _cd(char **argv);
 void free_prev_dir(void);
-int execute_commands(char *commands, char *program_name);
 
-#endif 
+/* Logical operators (Task 12) */
+int get_command_status(char *command, char *program_name);
+int execute_logical_ops(char *commands, char *program_name);
+
+/* Alias (Task 13) */
+int alias_builtin(char **argv);
+char *get_alias(char *name);
+int add_alias(char *name, char *value);
+void free_aliases(void);
+void print_aliases(void);
+int expand_aliases(char **command);
+
+/* Variable replacement (Task 14) */
+int replace_variables(char **command, int status);
+
+#endif  

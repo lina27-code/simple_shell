@@ -58,7 +58,7 @@ int add_alias(char *name, char *value)
     alias_head = new_alias;
 
     return (0);
-}
+ }
 
 /**
  * get_alias - gets the value of an alias
@@ -123,6 +123,11 @@ void free_aliases(void)
 {
     alias_t *current = alias_head;
     alias_t *next;
+    static int already_freed = 0;
+    
+    if (already_freed || alias_head == NULL)
+        return;
+    already_freed = 1;
 
     while (current != NULL)
     {
@@ -211,51 +216,115 @@ int expand_aliases(char **command)
  *
  * Return: 0 on success, -1 on failure
  */
-int alias_builtin(char **argv)
+
+ int alias_builtin(char **argv)
 {
+    int i;
+    int status;
+    int total_len;
+    char *joined_args;
+    char *current;
+    char *next_space;
+    char *eq_pos;
+    char token[256];
+    int token_len;
+    int in_quotes;
     char *name;
     char *value;
-    char *equals_pos;
-    int i;
-    int status = 0;
+
+    status = 0;
+    total_len = 0;
 
     if (argv[1] == NULL)
     {
-        /* No arguments: print all aliases */
         print_aliases();
         return (0);
     }
 
+    /* Calculate total length for joined arguments */
     for (i = 1; argv[i] != NULL; i++)
     {
-        equals_pos = strchr(argv[i], '=');
+        total_len += strlen(argv[i]) + 1;
+    }
 
-        if (equals_pos == NULL)
+    joined_args = malloc(total_len + 1);
+    if (joined_args == NULL)
+        return (-1);
+
+    joined_args[0] = '\0';
+    for (i = 1; argv[i] != NULL; i++)
+    {
+        strcat(joined_args, argv[i]);
+        if (argv[i + 1] != NULL)
+            strcat(joined_args, " ");
+    }
+
+    /* Parse the joined string for aliases */
+    current = joined_args;
+
+    while (*current != '\0')
+    {
+        /* Skip leading spaces */
+        while (*current == ' ')
+            current++;
+
+        if (*current == '\0')
+            break;
+
+        /* Find the next space that's not inside quotes */
+        in_quotes = 0;
+        next_space = current;
+        while (*next_space != '\0')
         {
-            /* No '=': print this alias */
-            if (print_single_alias(argv[i]) == -1)
+            if (*next_space == '\'' || *next_space == '"')
+                in_quotes = !in_quotes;
+            else if (*next_space == ' ' && !in_quotes)
+                break;
+            next_space++;
+        }
+
+        /* Copy this token */
+        token_len = next_space - current;
+        if (token_len >= 255)
+            token_len = 254;
+        strncpy(token, current, token_len);
+        token[token_len] = '\0';
+
+        /* Check for '=' in this token */
+        eq_pos = strchr(token, '=');
+        if (eq_pos != NULL)
+        {
+            *eq_pos = '\0';
+            name = token;
+            value = eq_pos + 1;
+
+            /* Remove quotes if present */
+            if ((value[0] == '\'' || value[0] == '"') && 
+                (value[strlen(value)-1] == '\'' || value[strlen(value)-1] == '"'))
+            {
+                value++;
+                value[strlen(value)-1] = '\0';
+            }
+
+            add_alias(name, value);
+        }
+        else
+        {
+            /* No '=': print the alias */
+            if (print_single_alias(token) == -1)
             {
                 write(STDERR_FILENO, "alias: ", 7);
-                write(STDERR_FILENO, argv[i], strlen(argv[i]));
+                write(STDERR_FILENO, token, strlen(token));
                 write(STDERR_FILENO, " not found\n", 11);
                 status = 1;
             }
         }
-        else
-        {
-            /* '=' found: set alias */
-            *equals_pos = '\0';
-            name = argv[i];
-            value = equals_pos + 1;
 
-            if (add_alias(name, value) == -1)
-            {
-                write(STDERR_FILENO, "alias: failed to set alias\n", 27);
-                status = 1;
-            }
-            *equals_pos = '=';
-        }
+        current = next_space;
+        while (*current == ' ')
+            current++;
     }
 
+    free(joined_args);
     return (status);
 }

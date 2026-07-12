@@ -38,21 +38,24 @@ int execute_command(char *command, char *program_name)
 {
     pid_t pid;
     int status;
+    int argc;
     int i;
     char *argv[128];
-    int argc;
     char *full_path;
 
-    /* Handle empty command (just newline or spaces) */
+    /* Handle empty command */
     if (command == NULL || command[0] == '\0')
         return (0);
 
     /* Check if command is only whitespace */
-     i = 0;
+    i = 0;
     while (command[i] == ' ' || command[i] == '\t')
         i++;
     if (command[i] == '\0')
         return (0);
+
+    /* Expand aliases before parsing */
+    expand_aliases(&command);
 
     /* Parse command into arguments */
     argc = parse_command(command, argv);
@@ -70,6 +73,7 @@ int execute_command(char *command, char *program_name)
     full_path = find_in_path(argv[0]);
     if (full_path == NULL)
     {
+        
         print_error(program_name, argv[0]);
         return (127);
     }
@@ -91,6 +95,8 @@ int execute_command(char *command, char *program_name)
             print_error(program_name, argv[0]);
             exit(127);
         }
+        free(full_path);
+        exit(127);
     }
     else
     {
