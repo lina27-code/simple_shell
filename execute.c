@@ -36,12 +36,18 @@ int parse_command(char *command, char **argv)
  */
 int execute_command(char *command, char *program_name)
 {
+    char *comment_pos;
     pid_t pid;
     int status;
     int argc;
     int i;
     char *argv[128];
     char *full_path;
+    
+    /* Task 15: Remove comments (everything after #) */
+    comment_pos = strchr(command, '#');
+    if (comment_pos != NULL)
+        *comment_pos = '\0';
 
     /* Handle empty command */
     if (command == NULL || command[0] == '\0')

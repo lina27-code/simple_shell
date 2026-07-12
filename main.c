@@ -1,13 +1,52 @@
 #include "shell.h"
 
-int shell_exiting = 0;  /* Global flag to prevent double free */
-
 int main(int ac, char **av)
 {
     char *command;
     int status = 0;
-    (void)ac;
+    FILE *file;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t nread;
 
+    /* Task 16: File input mode */
+    if (ac == 2)
+    {
+        file = fopen(av[1], "r");
+        if (file == NULL)
+        {
+            perror("fopen");
+            return (1);
+        }
+
+        while ((nread = getline(&line, &len, file)) != -1)
+        {
+            /* Remove newline */
+            if (line[nread - 1] == '\n')
+                line[nread - 1] = '\0';
+
+            /* Skip empty lines */
+            if (line[0] != '\0')
+            {
+                last_exit_status = status;
+                replace_variables(&line, last_exit_status);
+                status = execute_commands(line, av[0]);
+            }
+
+            /* Free the line after each iteration */
+            free(line);
+            line = NULL;
+            len = 0;
+        }
+
+        free(line);
+        fclose(file);
+        free_prev_dir();
+        free_aliases();
+        return (status);
+    }
+
+    /* Interactive mode */
     while (1)
     {
         if (isatty(STDIN_FILENO))
@@ -27,8 +66,8 @@ int main(int ac, char **av)
         free(command);
     }
 
-    /* Clean up - only once at the very end */
     free_prev_dir();
     free_aliases();
+
     return (status);
 }        
