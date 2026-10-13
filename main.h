@@ -21,6 +21,9 @@ extern int shell_exiting;
 /* Prompt string */
 #define PROMPT "$ "
 
+void free_shell_resources(void);
+void shell_exit(int status);
+
 /* Alias structure (Task 13) */
 typedef struct alias_s
 {
