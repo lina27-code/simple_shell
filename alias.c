@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "main.h"
 
 /* Head of aliases linked list */
 static alias_t *alias_head = NULL;

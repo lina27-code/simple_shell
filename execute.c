@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "main.h"
 
 /**
  * parse_command - splits a command into arguments

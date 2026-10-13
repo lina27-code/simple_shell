@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "main.h"
 
 /* Global variables for variable replacement */
 int last_exit_status = 0;

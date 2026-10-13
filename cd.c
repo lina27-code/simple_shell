@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "main.h"
 
 /* Global variable to store previous directory for cd - */
 char *prev_dir = NULL;
@@ -11,59 +11,45 @@ char *prev_dir = NULL;
  */
 int _cd(char **argv)
 {
-    char *target_dir = NULL;
+    char *target_dir;
     char *home_dir;
     char *old_pwd;
     char cwd[1024];
 
-    /* Get current directory before changing */
-    if (getcwd(cwd, sizeof(cwd)) == NULL)
-    {
-        perror("getcwd");
-        return (-1);
-    }
-
-    /* Save old PWD for cd - */
-    old_pwd = strdup(cwd);
-    if (old_pwd == NULL)
-    {
-        perror("strdup");
-        return (-1);
-    }
-
-    /* Determine target directory */
     if (argv[1] == NULL)
     {
-        /* No argument: go to HOME */
         home_dir = _getenv("HOME");
         if (home_dir == NULL)
         {
             write(STDERR_FILENO, "cd: HOME not set\n", 17);
-            free(old_pwd);
             return (-1);
         }
         target_dir = home_dir;
     }
     else if (strcmp(argv[1], "-") == 0)
     {
-        /* cd -: go to previous directory */
         if (prev_dir == NULL)
         {
             write(STDERR_FILENO, "cd: OLDPWD not set\n", 19);
-            free(old_pwd);
             return (-1);
         }
         target_dir = prev_dir;
-        /* Print the directory name (like bash does) */
-        write(STDOUT_FILENO, target_dir, strlen(target_dir));
-        write(STDOUT_FILENO, "\n", 1);
     }
     else
     {
-        /* cd with explicit path */
         target_dir = argv[1];
     }
 
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
+    {
+        perror("getcwd");
+        return (-1);
+    }
+
+    old_pwd = strdup(cwd);
+    if (old_pwd == NULL)
+        return (-1);
+    
     /* Change directory */
     if (chdir(target_dir) != 0)
     {
@@ -80,7 +66,6 @@ int _cd(char **argv)
     /* Update PWD environment variable */
     if (getcwd(cwd, sizeof(cwd)) != NULL)
     {
-        /* Use _setenv to update PWD */
         _setenv("PWD", cwd, 1);
     }
 

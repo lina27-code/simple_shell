@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "main.h"
 
 /**
  * find_in_path - searches for a command in PATH
@@ -34,7 +34,7 @@ char *find_in_path(char *command)
         return (NULL);
 
     /* Search through each directory in PATH */
-    dir = _strtok(path_copy, ":");
+    dir = strtok(path_copy, ":");
     while (dir != NULL)
     {
         full_path = malloc(strlen(dir) + strlen(command) + 2);
@@ -52,7 +52,7 @@ char *find_in_path(char *command)
         }
 
         free(full_path);
-        dir = _strtok(NULL, ":");
+        dir = strtok(NULL, ":");
     }
 
     free(path_copy);

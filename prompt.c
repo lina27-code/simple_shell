@@ -1,4 +1,4 @@
- #include "shell.h"
+ #include "main.h"
 
 /**
  * display_prompt - displays the shell prompt
@@ -18,8 +18,9 @@ char *read_command(void)
     char *line = NULL;
     size_t len = 0;
     ssize_t nread;
+    int i;
 
-    nread = _getline(&line, &len, stdin);
+    nread = getline(&line, &len, stdin);
     if (nread == -1)
     {
         free(line);
@@ -29,6 +30,23 @@ char *read_command(void)
     /* Remove newline character */
     if (nread > 0 && line[nread - 1] == '\n')
         line[nread - 1] = '\0';
+    /* Skip leading whitespace */
+    i = 0;
+    while (line[i] == ' ' || line[i] == '\t')
+        i++;
+
+    /* If line is empty or only whitespace, return empty string */
+    if (line[i] == '\0')
+        return (line);
+
+    /* Remove trailing spaces (optional) */
+    i = nread - 1;
+    while (i >= 0 && (line[i] == ' ' || line[i] == '\t' || line[i] == '\n'))
+    {
+        line[i] = '\0';
+        i--;
+    }
+
 
     return (line);
 }
